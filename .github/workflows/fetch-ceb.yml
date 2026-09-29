@@ -1,0 +1,27 @@
+name: Fetch CEB Data
+on: workflow_dispatch
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download CEB files from Dropbox
+        run: |
+          mkdir -p ceb_data
+          cd ceb_data
+          for f in \
+            "imdb.tar.gz|4aykbs6c8myeq2y" \
+            "imdb-unique-plans.tar.gz|u3trdnof6xj074f" \
+            "imdb_data.json|o8m1fthow6zn1kg" \
+            "job.tar.gz|i2tphhwv1u4o26k" \
+            "joblight_train.tar.gz|iedwloyk6zse2kc" \
+            "jobm.tar.gz|z8dujmx7dqpggnm" \
+            "allbitmaps.tar.gz|eph3q5a3dcqv7io"; do
+            name="${f%%|*}"; id="${f##*|}"
+            wget -q -O "$name" "https://www.dropbox.com/s/$id?dl=1"
+          done
+          ls -lh
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ceb-data
+          path: ceb_data/
